@@ -1,7 +1,7 @@
 /*:
 @plugindesc
 Customize framerate with options.
-Version 0.1
+Version 0.1.1
 @author KoloMl
 @target MZ
 
