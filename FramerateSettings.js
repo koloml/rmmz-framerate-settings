@@ -43,6 +43,14 @@ framerate customization to Options menu.
 @min 0
 @parent options
 
+@param mz3dPatches
+@text MZ3D Patches
+
+@param mz3dForceSkyboxRerender
+@text Patch Skybox Flickering
+@desc This patch forces MZ3D to re-render everything again after skybox was rendered.
+@type boolean
+@default false
 
 */
 (() => {
@@ -52,6 +60,7 @@ framerate customization to Options menu.
     const enableFpsCounterOption = pluginSettings["enableFpsCounter"]==='true';
     const listOfFpsSettings = JSON.parse(pluginSettings["framerateOptions"]).map(Number);
     const defaultFramerate = Number(pluginSettings["defaultFramerate"]);
+    const forceRenderAfterSkybox = pluginSettings["mz3dForceSkyboxRerender"]==='true';
 
     let currentFramerate = null;
 
@@ -64,6 +73,23 @@ framerate customization to Options menu.
         Graphics.app.ticker.maxFPS = defaultFramerate;
 
         return isInitialized;
+    }
+
+    // MZ3D Patch: Fixes flickering when moving mouse around with frame limiter set too low.
+    if (window.mz3d && forceRenderAfterSkybox) {
+        const _mz3d_renderViews = mz3d.renderViews;
+
+        mz3d.renderViews = function () {
+            // First we check if at least some of the scenes needed rendering
+            const someSceneNeededRenderingBeforeCall = mz3d.View.list.length && mz3d.View.list.some(view => view.needsRender)
+
+            _mz3d_renderViews.apply(this, arguments);
+
+            // And if someone needed it, we change the last render timestamp forcing MZ3D to not skip scene rendering.
+            if (someSceneNeededRenderingBeforeCall) {
+                this._lastRender--;
+            }
+        }
     }
 
     if (enableFpsCounterOption) {
