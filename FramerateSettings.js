@@ -51,6 +51,7 @@ framerate customization to Options menu.
 @desc This patch forces MZ3D to re-render everything again after skybox was rendered.
 @type boolean
 @default false
+@parent mz3dPatches
 
 */
 (() => {
