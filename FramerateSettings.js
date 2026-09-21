@@ -126,7 +126,7 @@ framerate customization to Options menu.
                 }
 
                 // Selecting next value, if last value reached — begin from the start.
-                fpsSettingIndex = fpsSettingIndex + 1 % listOfFpsSettings.length;
+                fpsSettingIndex = (fpsSettingIndex + 1) % listOfFpsSettings.length;
 
                 currentFramerate = listOfFpsSettings[fpsSettingIndex];
                 Graphics.app.ticker.maxFPS = currentFramerate;
