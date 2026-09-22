@@ -1,0 +1,21 @@
+diff --git a/node_modules/@fenixengine/rmmz-ts/libs/rmmz/core/Graphics.d.ts b/node_modules/@fenixengine/rmmz-ts/libs/rmmz/core/Graphics.d.ts
+index 2ba52ef..e940580 100644
+--- a/node_modules/@fenixengine/rmmz-ts/libs/rmmz/core/Graphics.d.ts
++++ b/node_modules/@fenixengine/rmmz-ts/libs/rmmz/core/Graphics.d.ts
+@@ -12,6 +12,8 @@ declare class Graphics {
+   static height: number;
+   static width: number;
+ 
++  static _fpsCounter: InternalFPSCounter;
++
+   static initialize (): boolean;
+ 
+   static endLoading (): boolean;
+@@ -40,3 +42,7 @@ declare class Graphics {
+   static stopGameLoop (): void;
+ 
+ }
++
++interface InternalFPSCounter {
++    switchMode(): void;
++}

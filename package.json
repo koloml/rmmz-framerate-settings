@@ -1,0 +1,15 @@
+{
+  "name": "rmmz-framerate-settings",
+  "description": "Small experimental plugin for controlling the framerate of the games made in RPG Maker MZ",
+  "author": {
+    "name": "KoloMl",
+    "email": "thekolomoets@hotmail.com",
+    "url": "https://github.com/koloml"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@fenixengine/rmmz-ts": "^1.2.0",
+    "patch-package": "^8.0.1",
+    "typescript": "^7.0.2"
+  }
+}
