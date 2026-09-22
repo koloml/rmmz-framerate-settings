@@ -28,6 +28,13 @@ framerate customization to Options menu.
 @default false
 @parent options
 
+@param framerateSettingsOrder
+@text Change Settings Order
+@desc Index position for the options. Negative values count from the end. Use big value like 999 to put it to the end.
+@type number
+@default 0
+@parent options
+
 @param framerateOptions
 @text Framerate Options
 @desc Provide list of framerate values available in options. 0 fps means "unlimited" (display refresh rate).
@@ -59,9 +66,15 @@ framerate customization to Options menu.
 
     const enableFramerateOption = pluginSettings["enableFramerate"]==='true';
     const enableFpsCounterOption = pluginSettings["enableFpsCounter"]==='true';
+    let optionsPositionIndex = Number(pluginSettings["framerateSettingsOrder"]);
     const listOfFpsSettings = JSON.parse(pluginSettings["framerateOptions"]).map(Number);
     const defaultFramerate = Number(pluginSettings["defaultFramerate"]);
     const forceRenderAfterSkybox = pluginSettings["mz3dForceSkyboxRerender"]==='true';
+
+    // Fall back to position at the top of options.
+    if (!Number.isFinite(optionsPositionIndex)) {
+        optionsPositionIndex = 0;
+    }
 
     let currentFramerate = null;
 
@@ -163,13 +176,23 @@ framerate customization to Options menu.
         Window_Options.prototype.makeCommandList = function () {
             _Window_Options_makeCommandList.apply(this, arguments);
 
+            // We need to move our custom options to some specific position in the options.
+            const optionsToMove = [];
+
             // First argument — text of the setting, second argument — key of the config value.
             if (enableFramerateOption) {
                 this.addCommand('Max FPS', 'graphicsMaxFps');
+                optionsToMove.push(this._list.pop());
             }
 
             if (enableFpsCounterOption) {
                 this.addCommand('Toggle FPS Counter', 'graphicsFpsCounter');
+                optionsToMove.push(this._list.pop());
+            }
+
+            // Move the options into desired position.
+            if (optionsToMove.length) {
+                this._list.splice(optionsPositionIndex, 0, ...optionsToMove);
             }
         }
 
