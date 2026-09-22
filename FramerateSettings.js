@@ -128,7 +128,7 @@ framerate customization to Options menu.
                 // Here we showing the actual maxFPS from engine.
                 return currentFramerate;
             },
-            set(v) {
+            set(maybeRequestedDirection) {
                 // Here we cycling through all available values.
                 // First we check where our current FPS value is placed in the array.
                 let fpsSettingIndex = listOfFpsSettings.findIndex(fpsValue => fpsValue===currentFramerate);
@@ -138,8 +138,20 @@ framerate customization to Options menu.
                     fpsSettingIndex = 0;
                 }
 
-                // Selecting next value, if last value reached — begin from the start.
-                fpsSettingIndex = (fpsSettingIndex + 1) % listOfFpsSettings.length;
+                let indexChangeDirection = 1;
+
+                // cursorLeft/Right will send value change direction as -1 or 1
+                if (typeof maybeRequestedDirection==="number" && Number.isFinite(maybeRequestedDirection)) {
+                    indexChangeDirection = maybeRequestedDirection < 0 ? -1:1;
+                }
+
+                // Move to the next index
+                fpsSettingIndex = (fpsSettingIndex + indexChangeDirection) % listOfFpsSettings.length;
+
+                // Loop back from the end of the list
+                if (fpsSettingIndex < 0) {
+                    fpsSettingIndex = listOfFpsSettings.length - 1;
+                }
 
                 currentFramerate = listOfFpsSettings[fpsSettingIndex];
                 Graphics.app.ticker.maxFPS = currentFramerate;
@@ -213,6 +225,34 @@ framerate customization to Options menu.
 
             // If we received call for other setting — then call the original function
             return _Window_Options_statusText.apply(this, arguments);
+        }
+
+        // Register handlers to change the framerate in specific direction
+        if (enableFramerateOption) {
+            const _Window_Options_cursorLeft = Window_Options.prototype.cursorLeft;
+            const _Window_Options_cursorRight = Window_Options.prototype.cursorRight;
+
+            Window_Options.prototype.cursorLeft = function () {
+                const commandSymbol = this.commandSymbol(this.index());
+
+                if (commandSymbol!=='graphicsMaxFps') {
+                    _Window_Options_cursorLeft.apply(this, arguments);
+                    return;
+                }
+
+                this.changeValue(commandSymbol, -1);
+            }
+
+            Window_Options.prototype.cursorRight = function () {
+                const commandSymbol = this.commandSymbol(this.index());
+
+                if (commandSymbol!=='graphicsMaxFps') {
+                    _Window_Options_cursorRight.apply(this, arguments);
+                    return;
+                }
+
+                this.changeValue(commandSymbol, 1);
+            }
         }
     }
 })();
